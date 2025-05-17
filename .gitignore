@@ -1,0 +1,23 @@
+
+*.iml
+.gradle
+.idea
+.DS_Store
+build
+*/build
+captures
+.externalNativeBuild
+.cxx
+local.properties
+xcuserdata/
+Pods/
+Podfile.lock
+*.jks
+*yarn.lock
+*.podspec
+.kotlin
+docs/kdoc
+
+# TODO
+docs/
+mkdocs.yml
