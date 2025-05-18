@@ -13,7 +13,6 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -28,7 +27,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import ru.nikfirs.mapkit.compose.Circle
 import ru.nikfirs.mapkit.compose.ClusterGroup
@@ -39,11 +37,13 @@ import ru.nikfirs.mapkit.compose.MapLogoConfig
 import ru.nikfirs.mapkit.compose.Placemark
 import ru.nikfirs.mapkit.compose.Polygon
 import ru.nikfirs.mapkit.compose.Polyline
-import ru.nikfirs.mapkit.compose.YandexMap
 import ru.nikfirs.mapkit.compose.YandexMapComposable
+import ru.nikfirs.mapkit.compose.YandexMapWithButtons
 import ru.nikfirs.mapkit.compose.YandexMapsComposeExperimentalApi
 import ru.nikfirs.mapkit.compose.bindToLifecycleOwner
 import ru.nikfirs.mapkit.compose.imageProvider
+import ru.nikfirs.mapkit.compose.models.NavigationButtonModel
+import ru.nikfirs.mapkit.compose.models.ZoomButtonModel
 import ru.nikfirs.mapkit.compose.rememberAndInitializeMapKit
 import ru.nikfirs.mapkit.compose.rememberCameraPositionState
 import ru.nikfirs.mapkit.compose.rememberCircleState
@@ -62,7 +62,6 @@ import ru.nikfirs.mapkit.geometry.Point
 import ru.nikfirs.mapkit.logo.LogoAlignment
 import ru.nikfirs.mapkit.logo.LogoHorizontalAlignment
 import ru.nikfirs.mapkit.logo.LogoVerticalAlignment
-
 
 @OptIn(YandexMapsComposeExperimentalApi::class)
 @Composable
@@ -100,15 +99,6 @@ fun NewMapScreen(modifier: Modifier = Modifier) {
             Text("clicks: $clicksCount", fontSize = 12.sp)
         }
     }
-    var zoomFactor by remember { mutableStateOf(0f) }
-    LaunchedEffect(zoomFactor) {
-        while (zoomFactor != 0f) {
-            val position = cameraPositionState.position
-            cameraPositionState.position =
-                position.copy(zoom = position.zoom + zoomFactor)
-            delay(100)
-        }
-    }
     val userLocationState = rememberUserLocationState()
     Scaffold(
         bottomBar = {
@@ -129,7 +119,7 @@ fun NewMapScreen(modifier: Modifier = Modifier) {
         modifier = modifier,
     ) { _ ->
         Box {
-            YandexMap(
+            YandexMapWithButtons(
                 cameraPositionState = cameraPositionState,
                 locationState = userLocationState,
                 locationConfig = UserLocationConfig(
@@ -152,6 +142,15 @@ fun NewMapScreen(modifier: Modifier = Modifier) {
                             vertical = LogoVerticalAlignment.TOP,
                         )
                     )
+                ),
+                navigationButtonModel = NavigationButtonModel(
+                    zoomButtonModel = ZoomButtonModel(
+                        contentColor = Color.DarkGray,
+                        backgroundColor = Color.White.copy(alpha = 0.95f),
+                    ),
+                    leftButtonCardModifier = Modifier
+                        .align(Alignment.CenterEnd)
+                        .padding(end = 10.dp)
                 ),
                 modifier = Modifier.fillMaxSize(),
             ) {
@@ -189,25 +188,8 @@ fun NewMapScreen(modifier: Modifier = Modifier) {
                     )
                 }
             }
-            MapControl(
-                onZoomIn = {
-                    zoomFactor = 0.25f
-                },
-                onZoomOut = {
-                    zoomFactor = -0.25f
-                },
-                onZoomStop = {
-                    zoomFactor = 0f
-                },
-                modifier = Modifier.align(Alignment.CenterEnd)
-            )
         }
     }
-}
-
-@Composable
-fun Map(modifier: Modifier = Modifier) {
-
 }
 
 @Composable

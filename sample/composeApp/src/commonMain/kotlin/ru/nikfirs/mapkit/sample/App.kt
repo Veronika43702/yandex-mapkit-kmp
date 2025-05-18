@@ -46,7 +46,7 @@ fun NavHost(
 ) {
     when (navItem) {
         NavItem.SELECTION -> Selection(onNavigate, modifier)
-        NavItem.OLD_API -> MapScreen(modifier)
+        NavItem.OLD_API -> {}//MapScreen(modifier)
         NavItem.NEW_API_OBJECTS -> NewMapScreen(modifier)
     }
 }
