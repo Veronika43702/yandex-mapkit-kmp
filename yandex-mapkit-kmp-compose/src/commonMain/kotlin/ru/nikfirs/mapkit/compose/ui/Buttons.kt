@@ -12,8 +12,10 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
@@ -30,6 +32,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
@@ -40,7 +43,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.coroutineScope
+import org.jetbrains.compose.resources.painterResource
 import ru.nikfirs.mapkit.compose.models.ZoomButtonAction
+import ru.nikfirs.mapkit.yandex_mapkit_kmp_compose.generated.resources.Res
+import ru.nikfirs.mapkit.yandex_mapkit_kmp_compose.generated.resources.ic_navigation_24px
 
 @Composable
 public fun CombinedFilledTonalIconButton(
@@ -49,7 +55,7 @@ public fun CombinedFilledTonalIconButton(
     onTap: (() -> Unit)? = null,
     size: Dp = 48.dp,
     modifier: Modifier = Modifier,
-    backgroundColor: Color = MaterialTheme.colorScheme.surface.copy(0.7f),
+    backgroundColor: Color = MaterialTheme.colorScheme.surface.copy(0.9f),
     shape: Shape = IconButtonDefaults.filledShape,
     contentColor: Color = Color.DarkGray,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
@@ -83,7 +89,7 @@ public fun CombinedSurface(
     onTap: (() -> Unit)? = null,
     modifier: Modifier = Modifier,
     shape: Shape = RectangleShape,
-    backgroundColor: Color = MaterialTheme.colorScheme.surface.copy(0.95f),
+    backgroundColor: Color = MaterialTheme.colorScheme.surface.copy(0.9f),
     contentColor: Color = Color.DarkGray,
     shadowElevation: Dp = 0.dp,
     border: BorderStroke? = null,
@@ -166,7 +172,7 @@ public fun ButtonZoomIn(
     onPressEnd: (() -> Unit)? = null,
     onTap: (() -> Unit)? = null,
     modifier: Modifier = Modifier,
-    backgroundColor: Color = Color.White.copy(alpha = 0.95f),
+    backgroundColor: Color = MaterialTheme.colorScheme.surface.copy(alpha = 0.9f),
     contentColor: Color = MaterialTheme.colorScheme.onSurface,
     size: Dp = 48.dp,
     shape: Shape = RoundedCornerShape(16.dp),
@@ -194,7 +200,7 @@ public fun ButtonZoomOut(
     onPressEnd: (() -> Unit)? = null,
     onTap: (() -> Unit)? = null,
     modifier: Modifier = Modifier,
-    backgroundColor: Color = Color.White.copy(alpha = 0.95f),
+    backgroundColor: Color = MaterialTheme.colorScheme.surface.copy(alpha = 0.9f),
     contentColor: Color = MaterialTheme.colorScheme.onSurface,
     size: Dp = 48.dp,
     shape: Shape = RoundedCornerShape(16.dp),
@@ -221,7 +227,7 @@ public fun MapControlZoom(
     modifier: Modifier = Modifier,
     zoomInButtonAction: ZoomButtonAction = ZoomButtonAction(),
     zoomOutButtonAction: ZoomButtonAction = ZoomButtonAction(),
-    backgroundColor: Color = Color.White.copy(alpha = 0.95f),
+    backgroundColor: Color = MaterialTheme.colorScheme.surface.copy(alpha = 0.9f),
     contentColor: Color = MaterialTheme.colorScheme.onSurface,
     size: Dp = 48.dp,
     shape: Shape = RoundedCornerShape(16.dp),
@@ -249,5 +255,37 @@ public fun MapControlZoom(
             size = size,
             shape = shape,
         )
+    }
+}
+
+@Composable
+public fun ButtonCurrentPosition(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    backgroundColor: Color = MaterialTheme.colorScheme.surface.copy(alpha = 0.9f),
+    contentColor: Color = MaterialTheme.colorScheme.onSurface,
+    size: Dp = 48.dp,
+    shape: Shape = RoundedCornerShape(16.dp),
+    content: @Composable () -> Unit = {
+        Icon(
+            modifier = Modifier
+                .size(36.dp)
+                .padding(start = 4.dp, bottom = 4.dp)
+                .graphicsLayer { rotationZ = 45f },
+            painter = painterResource(Res.drawable.ic_navigation_24px),
+            tint = contentColor,
+            contentDescription = null,
+        )
+    },
+) {
+    CombinedFilledTonalIconButton(
+        modifier = modifier,
+        onTap = onClick,
+        shape = shape,
+        size = size,
+        backgroundColor = backgroundColor,
+        contentColor = contentColor,
+    ) {
+        content()
     }
 }

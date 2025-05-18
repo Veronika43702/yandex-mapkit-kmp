@@ -1,21 +1,33 @@
 package ru.nikfirs.mapkit.compose.models
 
-import androidx.compose.foundation.layout.padding
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 
 public data class NavigationButtonModel(
-    val leftButtonCardModifier: Modifier = Modifier.padding(end = 10.dp),
-    val leftCardButtonArrangementSpace: Dp = 30.dp,
     val zoomButtonModel: ZoomButtonModel? = null,
-    val northButtonCardModifier: Modifier = Modifier,
-    val showNorthSetButton: NorthButtonVisibility = NorthButtonVisibility.WHEN_NOT_NORTH,
+    val positionButtonModel: PositionButtonModel? = null,
+    val northButtonModel: NorthButtonModel? = null,
+    val colors: ButtonColor,
 )
 
 public data class ZoomButtonModel(
+    val zoomModifier: Modifier = Modifier,
     val zoomSpeed: Int = 30,
+    val colors: ButtonColor? = null,
+)
+
+public data class PositionButtonModel(
+    val positionModifier: Modifier = Modifier,
+    val colors: ButtonColor? = null,
+)
+
+public data class NorthButtonModel(
+    val northButtonModifier: Modifier = Modifier,
+    val colors: ButtonColor? = null,
+    val showNorthSetButton: NorthButtonVisibility = NorthButtonVisibility.WHEN_NOT_NORTH,
+)
+
+public data class ButtonColor(
     val contentColor: Color,
     val backgroundColor: Color,
 )

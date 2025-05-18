@@ -62,6 +62,7 @@ kotlin {
             implementation(compose.material3)
             implementation(compose.ui)
             implementation(compose.components.resources)
+            implementation(compose.animation)
             implementation(libs.lifecycle.compose)
             api(libs.lifecycle.runtime)
             implementation(libs.atomicfu)

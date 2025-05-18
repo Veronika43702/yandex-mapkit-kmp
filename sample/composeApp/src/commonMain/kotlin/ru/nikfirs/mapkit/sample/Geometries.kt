@@ -30,7 +30,7 @@ fun randomCircles(): List<Pair<Circle, MapObjectUserData>> {
     )
 }
 
-val startPosition = CameraPosition(Point(59.935016, 30.328903), 15f, 0f, 0f)
+val startPosition = CameraPosition(Point(54.716765, 20.499977), 12f, 0f, 0f)
 
 val polygon: Polygon
     get() {

@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.Saver
@@ -33,21 +34,36 @@ enum class NavItem {
 }
 
 @Composable
-fun App() {
+fun App(
+    hasPermission: State<Boolean>,
+    onNoPermissionGranted: () -> Unit = {},
+) {
     var navItem by rememberSaveable(stateSaver = NavItem.Saver) { mutableStateOf(NavItem.SELECTION) }
-    NavHost(navItem, onNavigate = { navItem = it }, modifier = Modifier.fillMaxSize())
+    NavHost(
+        navItem,
+        onNavigate = { navItem = it },
+        modifier = Modifier.fillMaxSize(),
+        hasPermission = hasPermission,
+        onNoPermissionGranted = onNoPermissionGranted,
+    )
 }
 
 @Composable
 fun NavHost(
     navItem: NavItem,
     onNavigate: (NavItem) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    hasPermission: State<Boolean>,
+    onNoPermissionGranted: () -> Unit = {},
 ) {
     when (navItem) {
         NavItem.SELECTION -> Selection(onNavigate, modifier)
         NavItem.OLD_API -> {}//MapScreen(modifier)
-        NavItem.NEW_API_OBJECTS -> NewMapScreen(modifier)
+        NavItem.NEW_API_OBJECTS -> NewMapScreen(
+            modifier,
+            hasPermission,
+            onNoPermissionGranted
+        )
     }
 }
 

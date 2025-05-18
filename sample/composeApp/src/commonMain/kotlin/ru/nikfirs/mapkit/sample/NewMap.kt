@@ -13,6 +13,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,7 +43,9 @@ import ru.nikfirs.mapkit.compose.YandexMapWithButtons
 import ru.nikfirs.mapkit.compose.YandexMapsComposeExperimentalApi
 import ru.nikfirs.mapkit.compose.bindToLifecycleOwner
 import ru.nikfirs.mapkit.compose.imageProvider
+import ru.nikfirs.mapkit.compose.models.ButtonColor
 import ru.nikfirs.mapkit.compose.models.NavigationButtonModel
+import ru.nikfirs.mapkit.compose.models.PositionButtonModel
 import ru.nikfirs.mapkit.compose.models.ZoomButtonModel
 import ru.nikfirs.mapkit.compose.rememberAndInitializeMapKit
 import ru.nikfirs.mapkit.compose.rememberCameraPositionState
@@ -62,10 +65,15 @@ import ru.nikfirs.mapkit.geometry.Point
 import ru.nikfirs.mapkit.logo.LogoAlignment
 import ru.nikfirs.mapkit.logo.LogoHorizontalAlignment
 import ru.nikfirs.mapkit.logo.LogoVerticalAlignment
+import ru.nikfirs.mapkit.map.CameraPosition
 
 @OptIn(YandexMapsComposeExperimentalApi::class)
 @Composable
-fun NewMapScreen(modifier: Modifier = Modifier) {
+fun NewMapScreen(
+    modifier: Modifier = Modifier,
+    hasPermission: State<Boolean>,
+    onNoPermissionGranted: () -> Unit = {},
+) {
     rememberAndInitializeMapKit().bindToLifecycleOwner()
     val cameraPositionState = rememberCameraPositionState { position = startPosition }
     val snackbarHostState = remember { SnackbarHostState() }
@@ -105,7 +113,9 @@ fun NewMapScreen(modifier: Modifier = Modifier) {
             MapActions(
                 state = mapActionsState,
                 onStartPosition = {
-                    cameraPositionState.position = startPosition
+                    cameraPositionState.position = userLocationState.cameraPosition?.target?.let {
+                        CameraPosition(it, 12f, 0f, 0f)
+                    } ?: startPosition
                 },
                 onUserLocation = {
                     userLocationState.cameraPosition?.let { cameraPositionState.position = it }
@@ -117,7 +127,7 @@ fun NewMapScreen(modifier: Modifier = Modifier) {
             SnackbarHost(snackbarHostState)
         },
         modifier = modifier,
-    ) { _ ->
+    ) { paddingValue ->
         Box {
             YandexMapWithButtons(
                 cameraPositionState = cameraPositionState,
@@ -145,13 +155,22 @@ fun NewMapScreen(modifier: Modifier = Modifier) {
                 ),
                 navigationButtonModel = NavigationButtonModel(
                     zoomButtonModel = ZoomButtonModel(
-                        contentColor = Color.DarkGray,
-                        backgroundColor = Color.White.copy(alpha = 0.95f),
+                        zoomModifier = Modifier
+                            .align(Alignment.CenterEnd)
+                            .padding(end = 10.dp),
                     ),
-                    leftButtonCardModifier = Modifier
-                        .align(Alignment.CenterEnd)
-                        .padding(end = 10.dp)
+                    positionButtonModel = PositionButtonModel(
+                        positionModifier = Modifier
+                            .align(Alignment.BottomEnd)
+                            .padding(end = 10.dp, bottom = paddingValue.calculateBottomPadding() + 10.dp),
+                    ),
+                    colors = ButtonColor(
+                        contentColor = Color.DarkGray,
+                        backgroundColor = Color.White.copy(alpha = 0.9f)
+                    ),
                 ),
+                onNoPermissionGranted = onNoPermissionGranted,
+                hasPermission = hasPermission,
                 modifier = Modifier.fillMaxSize(),
             ) {
                 if (mapActionsState.isPlacemarksEnabled) {
@@ -175,7 +194,7 @@ fun NewMapScreen(modifier: Modifier = Modifier) {
                     Polygons(onShowMessage = showMessage)
                 }
                 if (mapActionsState.isPolylinesEnabled) {
-                    Polylines(onShowMessage = showMessage)
+                    Polylines()
                 }
                 if (mapActionsState.isComposableContentEnabled) {
                     Placemark(
@@ -206,9 +225,7 @@ fun Polygons(
 }
 
 @Composable
-fun Polylines(
-    onShowMessage: (String) -> Unit,
-) {
+fun Polylines() {
     Polyline(
         state = rememberPolylineState(polyline),
         outlineColor = Color.DarkGray.copy(alpha = 0.4f),
