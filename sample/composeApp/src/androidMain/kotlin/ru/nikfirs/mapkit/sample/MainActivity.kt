@@ -11,6 +11,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.LifecycleStartEffect
+import ru.nikfirs.mapkit.sample.ui.AppTheme
+import ru.nikfirs.mapkit.sample.ui.LocalCustomColors
 
 
 class MainActivity : ComponentActivity() {

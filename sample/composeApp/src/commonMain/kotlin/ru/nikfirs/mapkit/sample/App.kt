@@ -15,6 +15,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import ru.nikfirs.mapkit.MapKit
+import ru.nikfirs.mapkit.sample.ui.AppTheme
 
 fun initMapKit() {
     MapKit.setApiKey(BuildKonfig.MAPKIT_API_KEY)
@@ -35,17 +36,19 @@ enum class NavItem {
 
 @Composable
 fun App(
-    hasPermission: State<Boolean>,
+    hasPermission: State<Boolean> = mutableStateOf(true),
     onNoPermissionGranted: () -> Unit = {},
 ) {
-    var navItem by rememberSaveable(stateSaver = NavItem.Saver) { mutableStateOf(NavItem.SELECTION) }
-    NavHost(
-        navItem,
-        onNavigate = { navItem = it },
-        modifier = Modifier.fillMaxSize(),
-        hasPermission = hasPermission,
-        onNoPermissionGranted = onNoPermissionGranted,
-    )
+    AppTheme {
+        var navItem by rememberSaveable(stateSaver = NavItem.Saver) { mutableStateOf(NavItem.SELECTION) }
+        NavHost(
+            navItem,
+            onNavigate = { navItem = it },
+            modifier = Modifier.fillMaxSize(),
+            hasPermission = hasPermission,
+            onNoPermissionGranted = onNoPermissionGranted,
+        )
+    }
 }
 
 @Composable
@@ -82,7 +85,7 @@ fun Selection(
                 onNavigate(NavItem.OLD_API)
             }
         ) {
-            Text("Old api objects")
+            Text("!!!!Old api objects")
         }
         OutlinedButton(
             onClick = {

@@ -45,6 +45,7 @@ import ru.nikfirs.mapkit.compose.bindToLifecycleOwner
 import ru.nikfirs.mapkit.compose.imageProvider
 import ru.nikfirs.mapkit.compose.models.ButtonColor
 import ru.nikfirs.mapkit.compose.models.NavigationButtonModel
+import ru.nikfirs.mapkit.compose.models.NorthButtonModel
 import ru.nikfirs.mapkit.compose.models.PositionButtonModel
 import ru.nikfirs.mapkit.compose.models.ZoomButtonModel
 import ru.nikfirs.mapkit.compose.rememberAndInitializeMapKit
@@ -66,6 +67,7 @@ import ru.nikfirs.mapkit.logo.LogoAlignment
 import ru.nikfirs.mapkit.logo.LogoHorizontalAlignment
 import ru.nikfirs.mapkit.logo.LogoVerticalAlignment
 import ru.nikfirs.mapkit.map.CameraPosition
+import ru.nikfirs.mapkit.sample.ui.LocalCustomColors
 
 @OptIn(YandexMapsComposeExperimentalApi::class)
 @Composable
@@ -74,6 +76,7 @@ fun NewMapScreen(
     hasPermission: State<Boolean>,
     onNoPermissionGranted: () -> Unit = {},
 ) {
+    val customColors = LocalCustomColors.current
     rememberAndInitializeMapKit().bindToLifecycleOwner()
     val cameraPositionState = rememberCameraPositionState { position = startPosition }
     val snackbarHostState = remember { SnackbarHostState() }
@@ -107,6 +110,7 @@ fun NewMapScreen(
             Text("clicks: $clicksCount", fontSize = 12.sp)
         }
     }
+
     val userLocationState = rememberUserLocationState()
     Scaffold(
         bottomBar = {
@@ -155,18 +159,26 @@ fun NewMapScreen(
                 ),
                 navigationButtonModel = NavigationButtonModel(
                     zoomButtonModel = ZoomButtonModel(
-                        zoomModifier = Modifier
+                        modifier = Modifier
                             .align(Alignment.CenterEnd)
                             .padding(end = 10.dp),
                     ),
-                    positionButtonModel = PositionButtonModel(
-                        positionModifier = Modifier
-                            .align(Alignment.BottomEnd)
-                            .padding(end = 10.dp, bottom = paddingValue.calculateBottomPadding() + 10.dp),
+                    positionAndNorthRowModifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(
+                            end = 10.dp,
+                            bottom = paddingValue.calculateBottomPadding() + 10.dp
+                        ),
+                    positionButtonModel = PositionButtonModel(),
+                    northButtonModel = NorthButtonModel(
+                        colors = ButtonColor(
+                            contentColor = customColors.northTint,
+                            backgroundColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.9f)
+                        )
                     ),
                     colors = ButtonColor(
-                        contentColor = Color.DarkGray,
-                        backgroundColor = Color.White.copy(alpha = 0.9f)
+                        contentColor = MaterialTheme.colorScheme.onSurface,
+                        backgroundColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.9f)
                     ),
                 ),
                 onNoPermissionGranted = onNoPermissionGranted,
