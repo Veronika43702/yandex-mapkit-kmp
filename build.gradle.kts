@@ -1,4 +1,3 @@
-import org.jetbrains.dokka.gradle.DokkaMultiModuleTask
 import java.util.Properties
 
 plugins {
@@ -12,28 +11,6 @@ plugins {
     alias(libs.plugins.buildKonfig).apply(false)
     alias(libs.plugins.publish).apply(false)
     alias(libs.plugins.atomicfu).apply(false)
-    alias(libs.plugins.dokka)
-}
-
-private val dokkaModules = mapOf(
-    "yandex-mapkit-kmp" to "Yandex MapKit SDK KMP",
-    "yandex-mapkit-kmp-compose" to "Yandex MapKit KMP SDK Compose Utils",
-)
-
-subprojects {
-    extra.set("library_version", getProperty("library_version", "null"))
-
-    group = "ru.nikfirs.mapkit"
-
-    if (name in dokkaModules.keys) {
-        apply(plugin = "org.jetbrains.dokka")
-    }
-}
-
-tasks.withType<DokkaMultiModuleTask>().configureEach {
-    moduleName.set("Yandex MapKit KMP")
-    moduleVersion.set(getProperty("library_version", "null"))
-    outputDirectory.set(file("$rootDir/docs/kdoc"))
 }
 
 fun Project.getProperty(name: String, defaultValue: String): String {

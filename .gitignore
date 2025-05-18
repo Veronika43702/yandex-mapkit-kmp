@@ -21,3 +21,5 @@ docs/kdoc
 # TODO
 docs/
 mkdocs.yml
+
+build_log.txt

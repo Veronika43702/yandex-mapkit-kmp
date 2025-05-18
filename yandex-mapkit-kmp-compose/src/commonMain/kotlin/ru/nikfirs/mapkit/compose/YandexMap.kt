@@ -1,12 +1,13 @@
 package ru.nikfirs.mapkit.compose
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -30,8 +31,10 @@ import ru.nikfirs.mapkit.compose.composition.MapUpdaterState
 import ru.nikfirs.mapkit.compose.composition.launchMapComposition
 import ru.nikfirs.mapkit.compose.models.ButtonColor
 import ru.nikfirs.mapkit.compose.models.NavigationButtonModel
+import ru.nikfirs.mapkit.compose.models.NorthButtonVisibility
 import ru.nikfirs.mapkit.compose.models.ZoomButtonAction
 import ru.nikfirs.mapkit.compose.ui.ButtonCurrentPosition
+import ru.nikfirs.mapkit.compose.ui.ButtonOrientNorth
 import ru.nikfirs.mapkit.compose.ui.MapControlZoom
 import ru.nikfirs.mapkit.compose.user_location.UserLocationConfig
 import ru.nikfirs.mapkit.compose.user_location.UserLocationState
@@ -102,6 +105,23 @@ public fun YandexMap(
     }
 }
 
+/**
+ * Function with map and navigation control buttons:
+ * * zooming ([ButtonZoomIn][ru.nikfirs.mapkit.compose.ui.ButtonZoomIn] and [ButtonZoomOut][ru.nikfirs.mapkit.compose.ui.ButtonZoomOut])
+ * * setting user location [ButtonCurrentPosition][ru.nikfirs.mapkit.compose.ui.ButtonCurrentPosition]
+ * * setting map to North azimuth [ButtonOrientNorth][ru.nikfirs.mapkit.compose.ui.ButtonOrientNorth]
+ *
+ * @param navigationButtonModel sets properties for navigation control buttons.
+ * When null - no button is shown (better then use YandexMap function - it's without buttons).
+ * You can customise all buttons directly using appropriate functions
+ * instead of default button arrangement and view by navigationButtonModel.
+ * @param onNoPermissionGranted executed when
+ * [ButtonCurrentPosition][ru.nikfirs.mapkit.compose.ui.ButtonCurrentPosition] was clicked and
+ * [hasPermission] equals false.
+ * @param hasPermission shows if there's location permission from user. If it is true, click on
+ * [ButtonCurrentPosition][ru.nikfirs.mapkit.compose.ui.ButtonCurrentPosition] works, if false
+ * [ButtonCurrentPosition][ru.nikfirs.mapkit.compose.ui.ButtonCurrentPosition] executes on click.
+ */
 @YandexMapsComposeExperimentalApi
 @Composable
 public fun YandexMapWithButtons(
@@ -122,24 +142,31 @@ public fun YandexMapWithButtons(
 ) {
     val scope = rememberCoroutineScope()
 
+    // Zoom control
     var isZooming by remember { mutableStateOf(false) }
     var zoomDirection by remember { mutableStateOf(0) }
-
     LaunchedEffect(isZooming, zoomDirection) {
         if (isZooming && zoomDirection != 0) {
             while (isZooming) {
                 val currentZoom = cameraPositionState.position.zoom
                 val newZoom = currentZoom + (zoomDirection * 0.1f)
-                cameraPositionState.position = CameraPosition(
-                    cameraPositionState.position.target,
-                    newZoom.coerceIn(2f, 21f),
-                    cameraPositionState.position.tilt,
-                    cameraPositionState.position.azimuth
+                cameraPositionState.position = cameraPositionState.position.copy(
+                    zoom = newZoom.coerceIn(2f, 21f),
                 )
                 delay(navigationButtonModel?.zoomButtonModel?.zoomSpeed?.toLong() ?: 30)
             }
         }
     }
+
+    // North Orientation Settings
+    val currentAzimuth = remember { mutableStateOf(0f) }
+    LaunchedEffect(cameraPositionState.position.azimuth) {
+        val mapAzimuth = cameraPositionState.position.azimuth
+        val normalizedMapAzimuth = ((mapAzimuth % 360) + 360) % 360
+
+        currentAzimuth.value = -normalizedMapAzimuth
+    }
+
     Box(
         modifier = modifier,
     ) {
@@ -156,7 +183,7 @@ public fun YandexMapWithButtons(
 
         navigationButtonModel?.zoomButtonModel?.let { zoomModel ->
             MapControlZoom(
-                modifier = navigationButtonModel.zoomButtonModel.zoomModifier,
+                modifier = navigationButtonModel.zoomButtonModel.modifier,
                 zoomInButtonAction = ZoomButtonAction(
                     onTap = {
                         scope.launch {
@@ -174,8 +201,8 @@ public fun YandexMapWithButtons(
                         zoomDirection = 1
                     },
                     onPressEnd = {
-                        isZooming = false
                         zoomDirection = 0
+                        isZooming = false
                     }
                 ),
                 zoomOutButtonAction = ZoomButtonAction(onTap = {
@@ -206,12 +233,54 @@ public fun YandexMapWithButtons(
         }
 
         Row(
-            modifier = Modifier.align(Alignment.BottomEnd),
-            horizontalArrangement = Arrangement.spacedBy(10.dp)
+            modifier = navigationButtonModel?.positionAndNorthRowModifier ?: Modifier,
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
+            navigationButtonModel?.northButtonModel?.let { northButton ->
+                if (northButton.showNorthSetButton == NorthButtonVisibility.ALWAYS
+                    || (northButton.showNorthSetButton == NorthButtonVisibility.WHEN_NOT_NORTH
+                            && currentAzimuth.value != 0f)
+                ) {
+                    ButtonOrientNorth(
+                        modifier = northButton.modifier,
+                        onClick = {
+                            scope.launch {
+                                val currentPosition = cameraPositionState.position
+                                val currentMapAzimuth =
+                                    ((currentPosition.azimuth % 360) + 360) % 360
+                                val targetAzimuth = if (currentMapAzimuth > 180) 360f else 0f
+                                val anim = Animatable(currentMapAzimuth)
+                                anim.animateTo(
+                                    targetValue = targetAzimuth,
+                                    animationSpec = tween(
+                                        durationMillis = 500,
+                                        easing = FastOutSlowInEasing
+                                    )
+                                ) {
+                                    cameraPositionState.position = currentPosition.copy(
+                                        azimuth = this.value
+                                    )
+                                }
+                                if (targetAzimuth == 360f) {
+                                    cameraPositionState.position =
+                                        currentPosition.copy(azimuth = 0f)
+                                    currentAzimuth.value = 0f
+                                }
+                            }
+                        },
+                        rotation = currentAzimuth.value,
+                        contentColor = northButton.colors?.contentColor
+                            ?: navigationButtonModel.colors.contentColor,
+                        backgroundColor = northButton.colors?.backgroundColor
+                            ?: navigationButtonModel.colors.backgroundColor,
+                    )
+                }
+            }
+
             navigationButtonModel?.positionButtonModel?.let { positionButton ->
                 ButtonCurrentPosition(
-                    modifier = positionButton.positionModifier,
+                    modifier = positionButton.modifier,
                     onClick = {
                         if (hasPermission.value) {
                             locationState.cameraPosition?.let {
@@ -248,8 +317,8 @@ private suspend fun animateZoom(
         cameraPositionState.position = CameraPosition(
             cameraPositionState.position.target,
             newZoom,
-            cameraPositionState.position.tilt,
-            cameraPositionState.position.azimuth
+            cameraPositionState.position.azimuth,
+            cameraPositionState.position.tilt
         )
         delay((durationMs / steps).toLong())
     }

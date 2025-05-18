@@ -4,18 +4,19 @@ plugins {
     alias(libs.plugins.multiplatform)
     alias(libs.plugins.android.library)
     alias(libs.plugins.cocoapods)
-    alias(libs.plugins.publish)
+    id("maven-publish")
 }
 
 val supportIosTarget = project.property("skipIosTarget") != "true"
+group = "ru.nikfirs.mapkit"
 version = extra["library_version"].toString()
 
 kotlin {
     androidTarget {
+        publishAllLibraryVariants()
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_22)
         }
-        publishLibraryVariants("release")
     }
 
     if (supportIosTarget) {
@@ -27,6 +28,7 @@ kotlin {
             ios.deploymentTarget = "15.0"
             framework {
                 baseName = "YandexMapKitKMP"
+                linkerOpts("-framework", "SystemConfiguration")
             }
             noPodspec()
             pod("YandexMapsMobile") {
