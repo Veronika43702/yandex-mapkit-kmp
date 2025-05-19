@@ -4,11 +4,9 @@ plugins {
     alias(libs.plugins.multiplatform)
     alias(libs.plugins.android.library)
     alias(libs.plugins.cocoapods)
-    alias(libs.plugins.publish)
 }
 
 val supportIosTarget = project.property("skipIosTarget") != "true"
-version = extra["library_version"].toString()
 
 kotlin {
     androidTarget {
@@ -27,6 +25,7 @@ kotlin {
             ios.deploymentTarget = "15.0"
             framework {
                 baseName = "YandexMapKitKMP"
+                linkerOpts = mutableListOf("-framework", "CoreLocation", "-framework", "SystemConfiguration")
             }
             noPodspec()
             pod("YandexMapsMobile") {

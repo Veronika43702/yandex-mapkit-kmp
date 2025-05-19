@@ -17,6 +17,7 @@
 		17BC27282DD8D1FE0052CEEE /* ComposeApp.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 17BC27242DD8C8B00052CEEE /* ComposeApp.framework */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		2152FB042600AC8F00CF470E /* iOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2152FB032600AC8F00CF470E /* iOSApp.swift */; };
 		7555FF83242A565900829871 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7555FF82242A565900829871 /* ContentView.swift */; };
+		B304B067DF6CB6617A92A1F5 /* Pods_iosApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D211DCBAB2B8124DE80A7000 /* Pods_iosApp.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -59,6 +60,7 @@
 				17BC27272DD8D1FE0052CEEE /* ComposeApp.framework in Frameworks */,
 				17BC27222DD8C0FC0052CEEE /* YandexMapsMobile.framework in Frameworks */,
 				17BC271A2DD8BD6B0052CEEE /* YandexMapsMobile.xcframework in Frameworks */,
+				B304B067DF6CB6617A92A1F5 /* Pods_iosApp.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

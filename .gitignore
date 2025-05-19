@@ -17,6 +17,7 @@ Podfile.lock
 *.podspec
 .kotlin
 docs/kdoc
+*.log
 
 # TODO
 docs/

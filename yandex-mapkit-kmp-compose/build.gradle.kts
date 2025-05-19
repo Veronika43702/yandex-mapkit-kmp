@@ -1,4 +1,3 @@
-import org.jetbrains.compose.ExperimentalComposeLibrary
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSetTree
@@ -10,12 +9,10 @@ plugins {
     alias(libs.plugins.compose.plugin)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.cocoapods)
-    alias(libs.plugins.publish)
     alias(libs.plugins.atomicfu)
 }
 
 val supportIosTarget = project.property("skipIosTarget") != "true"
-version = extra["library_version"].toString()
 
 kotlin {
     androidTarget {
@@ -36,6 +33,7 @@ kotlin {
             ios.deploymentTarget = "15.0"
             framework {
                 baseName = "YandexMapKitKMPCompose"
+                linkerOpts = mutableListOf("-framework", "CoreLocation", "-framework", "SystemConfiguration")
             }
             noPodspec()
             pod("YandexMapsMobile") {
@@ -62,7 +60,10 @@ kotlin {
             implementation(compose.material3)
             implementation(compose.ui)
             implementation(compose.components.resources)
-            implementation(compose.animation)
+            implementation(compose.animation) {
+                exclude(group = "androidx.annotation")
+                exclude(group = "androidx.collection")
+            }
             implementation(libs.lifecycle.compose)
             api(libs.lifecycle.runtime)
             implementation(libs.atomicfu)

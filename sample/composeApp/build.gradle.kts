@@ -34,10 +34,11 @@ kotlin {
         homepage = "Link to the Shared Module homepage"
         version = "1.0"
         ios.deploymentTarget = "15.0"
-       podfile = project.file("../iosApp/Podfile")
+        podfile = project.file("../iosApp/Podfile")
         framework {
             baseName = "ComposeApp"
             isStatic = true
+            linkerOpts = mutableListOf("-framework", "CoreLocation", "-framework", "SystemConfiguration")
         }
         pod("YandexMapsMobile") {
             version = libs.versions.yandex.mapkit.get()
