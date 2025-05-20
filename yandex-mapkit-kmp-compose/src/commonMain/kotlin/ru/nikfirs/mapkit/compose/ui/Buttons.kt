@@ -46,10 +46,10 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.coroutineScope
 import org.jetbrains.compose.resources.painterResource
 import ru.nikfirs.mapkit.compose.models.ZoomButtonAction
-import ru.nikfirs.mapkit.yandex_mapkit_kmp_compose.generated.resources.Res
-import ru.nikfirs.mapkit.yandex_mapkit_kmp_compose.generated.resources.ic_navigation_24px
-import ru.nikfirs.mapkit.yandex_mapkit_kmp_compose.generated.resources.ic_north_pointer
-import ru.nikfirs.mapkit.yandex_mapkit_kmp_compose.generated.resources.ic_north_pointer_red_part
+import ru.nikfirs.mapkit.yandex_mapkit_kmp_compose.Res
+import ru.nikfirs.mapkit.yandex_mapkit_kmp_compose.ic_navigation_24px
+import ru.nikfirs.mapkit.yandex_mapkit_kmp_compose.ic_north_pointer
+import ru.nikfirs.mapkit.yandex_mapkit_kmp_compose.ic_north_pointer_red_part
 
 @Composable
 public fun CombinedFilledTonalIconButton(

@@ -1,7 +1,5 @@
-import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSetTree
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 
 plugins {
     alias(libs.plugins.multiplatform)
@@ -10,18 +8,25 @@ plugins {
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.cocoapods)
     alias(libs.plugins.atomicfu)
+    id("maven-publish")
 }
 
 val supportIosTarget = project.property("skipIosTarget") != "true"
+group = "ru.nikfirs.mapkit"
+version = extra["library_version"].toString()
+
+compose {
+    resources {
+        packageOfResClass = "ru.nikfirs.mapkit.yandex_mapkit_kmp_compose"
+    }
+}
 
 kotlin {
     androidTarget {
+        publishAllLibraryVariants()
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_22)
         }
-        publishLibraryVariants("release")
-        @OptIn(ExperimentalKotlinGradlePluginApi::class)
-        instrumentedTestVariant.sourceSetTree.set(KotlinSourceSetTree.test)
     }
 
     if (supportIosTarget) {
@@ -33,7 +38,7 @@ kotlin {
             ios.deploymentTarget = "15.0"
             framework {
                 baseName = "YandexMapKitKMPCompose"
-                linkerOpts = mutableListOf("-framework", "CoreLocation", "-framework", "SystemConfiguration")
+                linkerOpts("-framework", "SystemConfiguration")
             }
             noPodspec()
             pod("YandexMapsMobile") {
@@ -72,7 +77,7 @@ kotlin {
     }
 
     //https://kotlinlang.org/docs/native-objc-interop.html#export-of-kdoc-comments-to-generated-objective-c-headers
-    targets.withType<org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget> {
+    targets.withType<KotlinNativeTarget> {
         compilations["main"].compileTaskProvider {
             compilerOptions {
                 freeCompilerArgs.add("-Xexport-kdoc")
@@ -114,18 +119,12 @@ kotlin {
     }
 }
 
-
-tasks.withType<KotlinCompilationTask<*>> {
-    compilerOptions.freeCompilerArgs.add("-opt-in=kotlinx.cinterop.ExperimentalForeignApi")
-}
-
-
 android {
     namespace = "ru.nikfirs.mapkit.compose"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
     defaultConfig {
-        minSdk =  libs.versions.android.minSdk.get().toInt()
+        minSdk = libs.versions.android.minSdk.get().toInt()
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     compileOptions {
