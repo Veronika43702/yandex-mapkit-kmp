@@ -284,7 +284,7 @@ public fun YandexMapWithButtons(
                     onClick = {
                         if (hasPermission.value) {
                             locationState.cameraPosition?.let {
-                                cameraPositionState.position = it
+                                cameraPositionState.position = it.copy(azimuth = 0f, tilt = 0f)
                             }
                         } else {
                             onNoPermissionGranted()
