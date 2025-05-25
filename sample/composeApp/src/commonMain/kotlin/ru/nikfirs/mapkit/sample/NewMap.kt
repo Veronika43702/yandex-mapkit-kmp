@@ -56,11 +56,6 @@ import ru.nikfirs.mapkit.compose.rememberPolygonState
 import ru.nikfirs.mapkit.compose.rememberPolylineState
 import ru.nikfirs.mapkit.compose.user_location.UserLocationConfig
 import ru.nikfirs.mapkit.compose.user_location.rememberUserLocationState
-import ru.nikfirs.mapkit.composeapp.generated.resources.Res
-import ru.nikfirs.mapkit.composeapp.generated.resources.cluster
-import ru.nikfirs.mapkit.composeapp.generated.resources.pin_green
-import ru.nikfirs.mapkit.composeapp.generated.resources.pin_red
-import ru.nikfirs.mapkit.composeapp.generated.resources.pin_yellow
 import ru.nikfirs.mapkit.geometry.Circle
 import ru.nikfirs.mapkit.geometry.Point
 import ru.nikfirs.mapkit.logo.LogoAlignment

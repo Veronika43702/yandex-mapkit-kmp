@@ -68,6 +68,7 @@ kotlin {
             implementation(compose.animation) {
                 exclude(group = "androidx.annotation")
                 exclude(group = "androidx.collection")
+                exclude(group = "androidx.savedstate")
             }
             implementation(libs.lifecycle.compose)
             api(libs.lifecycle.runtime)

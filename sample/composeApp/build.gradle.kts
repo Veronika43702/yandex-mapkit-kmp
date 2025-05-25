@@ -11,6 +11,12 @@ plugins {
     alias(libs.plugins.buildKonfig)
 }
 
+compose {
+    resources {
+        packageOfResClass = "ru.nikfirs.mapkit.sample"
+    }
+}
+
 kotlin {
     androidTarget {
         compilerOptions {
@@ -38,7 +44,8 @@ kotlin {
         framework {
             baseName = "ComposeApp"
             isStatic = true
-            linkerOpts = mutableListOf("-framework", "CoreLocation", "-framework", "SystemConfiguration")
+            linkerOpts =
+                mutableListOf("-framework", "CoreLocation", "-framework", "SystemConfiguration")
         }
         pod("YandexMapsMobile") {
             version = libs.versions.yandex.mapkit.get()
